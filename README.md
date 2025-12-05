@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# Sistema de Gestión de Tareas - Proyecto ADA 1
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este proyecto es una aplicación web desarrollada en **React** para la gestión eficiente de tareas, implementando estructuras de datos avanzadas para garantizar un rendimiento óptimo en operaciones de prioridad y búsqueda.
 
-## Available Scripts
+## Características Principales
 
-In the project directory, you can run:
+El sistema utiliza dos estructuras de datos fundamentales para manejar la lógica de negocio:
 
-### `npm start`
+### 1. Priority Heap (Montículo de Prioridad)
+Se utiliza para gestionar el orden de atención de las tareas.
+- **Lógica de Prioridad:**
+  1. **Nivel de Prioridad:** Alta (3) > Media (2) > Baja (1).
+  2. **Fecha de Vencimiento:** A igualdad de prioridad, la tarea que vence antes tiene preferencia.
+  3. **ID:** Como criterio de desempate final.
+- Permite obtener y completar siempre la tarea más importante en tiempo constante $O(1)$ (acceso) y logarítmico $O(\log n)$ (extracción).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 2. Árbol AVL
+Se utiliza como índice para búsquedas y modificaciones rápidas por ID.
+- Mantiene las tareas ordenadas por su ID.
+- Es un árbol binario de búsqueda **autobalanceado**.
+- Garantiza que las operaciones de búsqueda, inserción y eliminación sean siempre **$O(\log n)$**, incluso en el peor de los casos.
+- **Visualización de Pasos:** El sistema muestra en la consola del navegador cuántos pasos toma cada operación en el AVL para demostrar su eficiencia empíricamente.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tecnologías
 
-### `npm test`
+- **Frontend:** React.js
+- **Estilos:** Tailwind CSS + DaisyUI
+- **Lenguaje:** JavaScript (ES6+)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Requisitos Previos
 
-### `npm run build`
+Tener instalado:
+- [Node.js](https://nodejs.org/) (versión 14 o superior)
+- npm (viene incluido con Node.js)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Instalación y Ejecución
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Sigue estos pasos para correr el proyecto:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Instalar dependencias:**
+   Ejecuta el siguiente comando en la terminal dentro de la carpeta del proyecto:
+   ```bash
+   npm install
+   ```
 
-### `npm run eject`
+2. **Iniciar la aplicación:**
+   Esto levantará el servidor de desarrollo local:
+   ```bash
+   npm run start
+   ```
+   Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Cómo Usar y Probar
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Interfaz de Usuario
+- **Agregar Tarea:** Usa el formulario para ingresar ID, descripción, fecha y prioridad.
+- **Tabla de Tareas:** Muestra todas las tareas ordenadas según la lógica del Heap.
+- **Completar:** Puedes completar tareas específicas (desde la tabla) o usar el botón "Completar más prioritaria".
+- **Buscar/Eliminar:** Usa los campos en el panel lateral para buscar o eliminar tareas por ID usando el AVL.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Modo Debug y Demostración
+Para verificar el funcionamiento interno y la eficiencia de las estructuras:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Abre la **Consola del Desarrollador** en tu navegador (Presiona `F12` o `Ctrl+Shift+I`).
+2. En la aplicación, haz clic en el botón **"Debug Estructuras"**.
+3. Verás en la consola:
+   - La estructura interna del **Heap** (Array y representación de árbol).
+   - El estado del **Árbol AVL** dibujado en texto, mostrando alturas y balance.
+4. Al realizar operaciones (Buscar, Eliminar, Agregar), observa los logs en la consola que indican:
+   - `[AVL Search] ID: 101, Pasos: 3`
+   - Esto demuestra la eficiencia logarítmica del algoritmo.
