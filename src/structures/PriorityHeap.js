@@ -3,8 +3,33 @@ export class PriorityHeap {
     this.data = [];
   }
 
+  // Helper para fechas
+  parseDueDate(str) {
+    if (!str) return new Date(8640000000000000);
+    const ymd = /^(\d{4})-(\d{2})-(\d{2})$/;
+    const dmy = /^(\d{2})-(\d{2})-(\d{4})$/;
+    let m;
+    if ((m = str.match(ymd))) {
+      const [, y, mo, d] = m;
+      return new Date(Number(y), Number(mo) - 1, Number(d));
+    }
+    if ((m = str.match(dmy))) {
+      const [, d, mo, y] = m;
+      return new Date(Number(y), Number(mo) - 1, Number(d));
+    }
+    return new Date(8640000000000000);
+  }
+
   compare(a, b) {
+    // 1. Mayor prioridad gana
     if (a.priority !== b.priority) return a.priority > b.priority;
+    
+    // 2. Fecha más cercana gana (menor valor de fecha)
+    const da = this.parseDueDate(a.dueDate);
+    const db = this.parseDueDate(b.dueDate);
+    if (da.getTime() !== db.getTime()) return da < db;
+
+    // 3. ID más grande gana (como desempate final arbitrario o FIFO/LIFO según inserción si ID es incremental)
     return a.id > b.id;
   }
 
@@ -79,5 +104,25 @@ removeById(id) {
 
   getAll() {
     return [...this.data];
+  }
+
+  printHeap() {
+    console.group("Estado del Priority Heap (Array)");
+    console.table(this.data.map(t => ({
+      ID: t.id,
+      Prioridad: t.priority,
+      Vencimiento: t.dueDate,
+      Desc: t.description
+    })));
+    console.log("Estructura de árbol (índices):");
+    this.data.forEach((node, i) => {
+      const left = 2 * i + 1;
+      const right = 2 * i + 2;
+      let log = `[${i}] Tarea ${node.id} (P:${node.priority})`;
+      if (left < this.data.length) log += ` -> Izq: [${left}] ${this.data[left].id}`;
+      if (right < this.data.length) log += ` | Der: [${right}] ${this.data[right].id}`;
+      console.log(log);
+    });
+    console.groupEnd();
   }
 }

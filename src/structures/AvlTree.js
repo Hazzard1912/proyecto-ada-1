@@ -10,6 +10,7 @@ class Node {
 export class AvlTree {
   constructor() {
     this.root = null;
+    this.lastSteps = 0;
   }
 
   height(n) {
@@ -71,6 +72,7 @@ export class AvlTree {
   }
 
   insertRec(node, task) {
+    this.lastSteps++;
     if (!node) return new Node(task);
 
     if (task.id < node.task.id)
@@ -84,14 +86,17 @@ export class AvlTree {
 
     return this.balance(node);
   }
-
   insert(task) {
+    this.lastSteps = 0;
     this.root = this.insertRec(this.root, task);
+    return this.lastSteps;
   }
 
   searchRec(node, id) {
+    this.lastSteps++;
     if (!node) return null;
 
+    if (id === node.task.id) return node.task;
     if (id === node.task.id) return node.task;
 
     if (id < node.task.id) return this.searchRec(node.left, id);
@@ -100,16 +105,22 @@ export class AvlTree {
   }
 
   search(id) {
-    return this.searchRec(this.root, id);
+    this.lastSteps = 0;
+    const result = this.searchRec(this.root, id);
+    return { result, steps: this.lastSteps };
   }
 
   minNode(node) {
     let current = node;
-    while (current.left) current = current.left;
+    while (current.left) {
+      this.lastSteps++;
+      current = current.left;
+    }
     return current;
   }
 
   removeRec(node, id) {
+    this.lastSteps++;
     if (!node) return null;
 
     if (id < node.task.id)
@@ -132,6 +143,27 @@ export class AvlTree {
   }
 
   remove(id) {
+    this.lastSteps = 0;
     this.root = this.removeRec(this.root, id);
+    return this.lastSteps;
+  }
+
+  printTree() {
+    console.group("Estado del Árbol AVL");
+    if (!this.root) {
+      console.log("El árbol está vacío.");
+    } else {
+      this.printNode(this.root, "", true);
+    }
+    console.groupEnd();
+  }
+
+  printNode(node, indent, last) {
+    if (node) {
+      console.log(indent + (last ? "└─ " : "├─ ") + `[ID: ${node.task.id}] (H:${node.height})`);
+      indent += last ? "   " : "│  ";
+      this.printNode(node.left, indent, false);
+      this.printNode(node.right, indent, true);
+    }
   }
 }

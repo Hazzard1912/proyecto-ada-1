@@ -24,6 +24,11 @@ function App() {
     setTasks(manager.getAll());
   };
 
+  const debugStructures = () => {
+    manager.debug();
+    setMessage("Revisa la consola del navegador (F12) para ver el estado del Heap y AVL.");
+  };
+
   const addOrUpdate = (data) => {
     const t = new Task(data.id, data.description, data.priority, data.dueDate);
     const exists = manager.getById(t.id);
@@ -114,13 +119,23 @@ function App() {
   return (
     <div className="min-h-screen bg-base-200 p-4 md:p-8 font-sans text-base-content">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-base-content mb-2 tracking-tight">
-            Gestión de Tareas
-          </h1>
-          <p className="text-base text-base-content/60">
-            Sistema basado en Heap y Árboles AVL
-          </p>
+        <div className="mb-8 flex justify-between items-end">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-base-content mb-2 tracking-tight">
+              Gestión de Tareas
+            </h1>
+            <p className="text-base text-base-content/60">
+              Sistema basado en Heap y Árboles AVL
+            </p>
+          </div>
+          <button 
+            onClick={debugStructures}
+            className="btn btn-ghost btn-sm gap-2 text-base-content/70"
+            title="Ver estado interno (Consola)"
+          >
+            <Activity className="w-4 h-4" />
+            <span className="hidden sm:inline">Debug Estructuras</span>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

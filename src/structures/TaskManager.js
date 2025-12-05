@@ -30,11 +30,14 @@ export class TaskManager {
 
   add(task) {
     this.heap.push(task);
-    this.index.insert(task);
+    const steps = this.index.insert(task);
+    console.log(`[AVL Insert] ID: ${task.id}, Pasos: ${steps}`);
   }
 
   getById(id) {
-    return this.index.search(id);
+    const { result, steps } = this.index.search(id);
+    if (result) console.log(`[AVL Search] ID: ${id}, Pasos: ${steps}`);
+    return result;
   }
 
   getHighest() {
@@ -42,21 +45,23 @@ export class TaskManager {
   }
 
   update(task) {
-    const exists = this.index.search(task.id);
+    const { result: exists } = this.index.search(task.id);
     if (!exists) return false;
 
     this.heap.removeById(task.id);
-    this.index.insert(task);
+    const steps = this.index.insert(task);
+    console.log(`[AVL Update] ID: ${task.id}, Pasos: ${steps}`);
     this.heap.push(task);
 
     return true;
   }
 
   delete(id) {
-    const exists = this.index.search(id);
+    const { result: exists } = this.index.search(id);
     if (!exists) return false;
 
-    this.index.remove(id);
+    const steps = this.index.remove(id);
+    console.log(`[AVL Delete] ID: ${id}, Pasos: ${steps}`);
     this.heap.removeById(id);
 
     return true;
@@ -64,7 +69,10 @@ export class TaskManager {
 
   completeHighest() {
     const t = this.heap.pop();
-    if (t) this.index.remove(t.id);
+    if (t) {
+      const steps = this.index.remove(t.id);
+      console.log(`[AVL Delete (Complete)] ID: ${t.id}, Pasos: ${steps}`);
+    }
     return t;
   }
 
@@ -86,5 +94,13 @@ export class TaskManager {
       //ID más grande primero (por si tienen la prioridad y fecha igual pero tienen ID didferente)
       return b.id - a.id;
     });
+  }
+
+  debug() {
+    console.log("\n\n");
+    console.log("=== DEBUG: ESTADO DE LAS ESTRUCTURAS ===");
+    this.heap.printHeap();
+    this.index.printTree();
+    console.log("========================================");
   }
 }
