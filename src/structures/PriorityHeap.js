@@ -5,7 +5,7 @@ export class PriorityHeap {
 
   compare(a, b) {
     if (a.priority !== b.priority) return a.priority > b.priority;
-    return a.id < b.id;
+    return a.id > b.id;
   }
 
   push(task) {
@@ -57,18 +57,25 @@ export class PriorityHeap {
     return this.data.length === 0 ? null : this.data[0];
   }
 
-  removeById(id) {
-    const idx = this.data.findIndex(t => t.id === id);
-    if (idx === -1) return false;
+removeById(id) {
+  const idx = this.data.findIndex((t) => t.id === id);
+  if (idx === -1) return false;
 
-    const end = this.data.pop();
-    if (idx < this.data.length) {
-      this.data[idx] = end;
-      this.heapifyUp(idx);
-      this.heapifyDown(idx);
-    }
-    return true;
+  // Intercambiar con el último elemento
+  const last = this.data.length - 1;
+  [this.data[idx], this.data[last]] = [this.data[last], this.data[idx]];
+  this.data.pop();
+
+  // Reajustar heap si aún hay elementos
+  if (idx < this.data.length) {
+    this.heapifyUp(idx);
+    this.heapifyDown(idx);
   }
+
+  return true;
+}
+
+
 
   getAll() {
     return [...this.data];
