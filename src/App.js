@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { Search, Trash2, CheckCircle, Info, Activity } from 'lucide-react';
 import TaskForm from "./components/TaskForm";
 import TaskTable from "./components/TaskTable";
 import { Task } from "./structures/Task";
@@ -112,73 +112,98 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Gestión de Tareas con Heap y AVL</h1>
-
-      <div style={{ display: "flex", gap: "20px" }}>
-        <div style={{ flex: 1 }}>
-          <TaskForm onSubmit={addOrUpdate} />
+    <div className="min-h-screen bg-base-200 p-4 md:p-8 font-sans text-base-content">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-base-content mb-2 tracking-tight">
+            Gestión de Tareas
+          </h1>
+          <p className="text-base text-base-content/60">
+            Sistema basado en Heap y Árboles AVL
+          </p>
         </div>
 
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px"
-          }}
-        >
-          <h3>Operaciones</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-4 space-y-6">
+            <div className="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+              <div className="card-body p-6">
+                <TaskForm onSubmit={addOrUpdate} />
+              </div>
+            </div>
 
-          <div>
-            <input
-              type="number"
-              placeholder="ID a buscar (AVL)"
-              value={searchId}
-              onChange={e => setSearchId(e.target.value)}
-              style={{ width: "100%", marginBottom: "4px" }}
-            />
-            <button style={{ width: "100%" }} onClick={search}>
-              Buscar
-            </button>
+            <div className="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+              <div className="card-body p-6">
+                <h3 className="card-title text-lg font-semibold mb-4">Operaciones (AVL)</h3>
+                
+                <div className="flex flex-col gap-4">
+                  <div className="form-control">
+                    <label className="label pt-0 pb-1">
+                      <span className="label-text text-sm font-medium text-base-content/70">Buscar por ID</span>
+                    </label>
+                    <div className="join w-full">
+                      <input
+                        type="number"
+                        placeholder="Ej: 101"
+                        value={searchId}
+                        onChange={e => setSearchId(e.target.value)}
+                        className="input input-bordered join-item w-full focus:outline-none focus:border-primary bg-base-200/50"
+                      />
+                      <button className="btn btn-primary join-item" onClick={search}>
+                        <Search className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label pt-0 pb-1">
+                      <span className="label-text text-sm font-medium text-base-content/70">Eliminar por ID</span>
+                    </label>
+                    <div className="join w-full">
+                      <input
+                        type="number"
+                        placeholder="Ej: 101"
+                        value={deleteId}
+                        onChange={e => setDeleteId(e.target.value)}
+                        className="input input-bordered join-item w-full focus:outline-none focus:border-error bg-base-200/50"
+                      />
+                      <button className="btn btn-error join-item text-white" onClick={remove}>
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="divider my-1"></div>
+
+                  <button className="btn btn-primary w-full rounded-xl font-bold normal-case" onClick={completeHighest}>
+                    Completar más prioritaria
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <input
-              type="number"
-              placeholder="ID a eliminar"
-              value={deleteId}
-              onChange={e => setDeleteId(e.target.value)}
-              style={{ width: "100%", marginBottom: "4px" }}
-            />
-            <button style={{ width: "100%" }} onClick={remove}>
-              Eliminar
-            </button>
-          </div>
+          <div className="lg:col-span-8">
+            {message && (
+              <div role="alert" className="alert shadow-sm mb-6 bg-base-100 border border-base-200 rounded-xl">
+                <Info className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm font-medium">{message}</span>
+              </div>
+            )}
 
-          <button style={{ width: "100%" }} onClick={completeHighest}>
-            Completar más prioritaria
-          </button>
+            <div className="card bg-base-100 shadow-sm border border-base-200 h-full rounded-2xl">
+              <div className="card-body p-0">
+                <div className="p-6 border-b border-base-200 flex justify-between items-center">
+                  <h2 className="card-title text-lg font-semibold">Lista de Tareas</h2>
+                  <div className="badge badge-ghost">Total: {tasks.length}</div>
+                </div>
+                <div className="p-0">
+                  <TaskTable tasks={tasks} onComplete={completeById} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {message && (
-        <div
-          style={{
-            marginTop: "16px",
-            padding: "8px",
-            backgroundColor: "#e8f4ff",
-            borderRadius: "6px",
-            border: "1px solid #bcdfff",
-            fontSize: "0.9rem"
-          }}
-        >
-          {message}
-        </div>
-      )}
-
-      <h2 style={{ marginTop: "24px" }}>Tareas (Heap)</h2>
-      <TaskTable tasks={tasks} onComplete={completeById} />
     </div>
   );
 }
