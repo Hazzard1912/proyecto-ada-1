@@ -1,5 +1,3 @@
-// src/structures/PriorityHeap.js
-
 export class PriorityHeap {
   constructor() {
     this.data = [];
