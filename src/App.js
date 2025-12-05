@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import TaskForm from "./components/TaskForm";
 import TaskTable from "./components/TaskTable";
@@ -6,13 +7,22 @@ import { TaskManager } from "./structures/TaskManager";
 
 const manager = new TaskManager();
 
+function priorityToText(p) {
+  if (p === 3) return "Alta";
+  if (p === 2) return "Media";
+  return "Baja";
+}
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [searchId, setSearchId] = useState("");
   const [deleteId, setDeleteId] = useState("");
   const [message, setMessage] = useState("");
 
-  const refresh = () => setTasks(manager.getAll());
+  const refresh = () => {
+    // SIEMPRE usa el getAll() del TaskManager (ya ordenado)
+    setTasks(manager.getAll());
+  };
 
   const addOrUpdate = (data) => {
     const t = new Task(data.id, data.description, data.priority, data.dueDate);
@@ -20,67 +30,160 @@ function App() {
 
     if (exists) {
       manager.update(t);
-      setMessage(`Tarea ${t.id} actualizada`);
+      setMessage(
+        `Tarea ${t.id} actualizada: "${t.description}", prioridad ${priorityToText(
+          t.priority
+        )}, vence el ${t.dueDate}.`
+      );
     } else {
       manager.add(t);
-      setMessage(`Tarea ${t.id} agregada`);
+      setMessage(
+        `Tarea ${t.id} agregada: "${t.description}", prioridad ${priorityToText(
+          t.priority
+        )}, vence el ${t.dueDate}.`
+      );
     }
     refresh();
   };
 
-  const complete = () => {
+  const completeHighest = () => {
     const t = manager.completeHighest();
-    if (!t) return setMessage("No hay tareas");
-    setMessage(`Completada tarea ID ${t.id}`);
+    if (!t) {
+      setMessage("No hay tareas en la cola de prioridad.");
+      return;
+    }
+    setMessage(
+      `Tarea ID ${t.id} marcada como completada (era la más prioritaria, prioridad ${priorityToText(
+        t.priority
+      )}, vencía el ${t.dueDate}).`
+    );
+    refresh();
+  };
+
+  const completeById = (id) => {
+    const t = manager.getById(id);
+    if (!t) {
+      setMessage(`No existe tarea con ID ${id}.`);
+      return;
+    }
+    manager.delete(id);
+    setMessage(
+      `Tarea ID ${id} marcada como completada: "${t.description}", prioridad ${priorityToText(
+        t.priority
+      )}, vencía el ${t.dueDate}.`
+    );
     refresh();
   };
 
   const search = () => {
     const id = Number(searchId);
-    const t = manager.getById(id);
-    if (!t) setMessage(`No existe tarea con ID ${id}`);
-    else setMessage(`Encontrada tarea ${id}: ${t.description}`);
+    if (!id) {
+      setMessage("Ingresa un ID válido para buscar.");
+      return;
+    }
+
+    const t = manager.getById(id); // AVL
+    if (!t) {
+      setMessage(`No existe tarea con ID ${id}.`);
+      return;
+    }
+
+    setMessage(
+      `AVL: encontrada tarea ID ${t.id}: "${t.description}", prioridad ${priorityToText(
+        t.priority
+      )}, fecha de vencimiento ${t.dueDate}.`
+    );
   };
 
   const remove = () => {
     const id = Number(deleteId);
+    if (!id) {
+      setMessage("Ingresa un ID válido para eliminar.");
+      return;
+    }
+
     const ok = manager.delete(id);
-    setMessage(ok ? `Tarea ${id} eliminada` : `No existe tarea ${id}`);
-    refresh();
+    if (!ok) {
+      setMessage(`No existe tarea con ID ${id}.`);
+    } else {
+      setMessage(`Tarea ID ${id} eliminada del sistema (Heap + AVL).`);
+      refresh();
+    }
   };
 
   return (
     <div style={{ padding: 20 }}>
       <h1>Gestión de Tareas con Heap y AVL</h1>
 
-      <div style={{ display: "flex", gap:"20px" }}>
-        <TaskForm onSubmit={addOrUpdate} />
+      <div style={{ display: "flex", gap: "20px" }}>
+        <div style={{ flex: 1 }}>
+          <TaskForm onSubmit={addOrUpdate} />
+        </div>
 
-        <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px"
+          }}
+        >
           <h3>Operaciones</h3>
 
-          <input placeholder="Buscar ID" value={searchId} onChange={e => setSearchId(e.target.value)} />
-          <button onClick={search}>Buscar</button>
+          <div>
+            <input
+              type="number"
+              placeholder="ID a buscar (AVL)"
+              value={searchId}
+              onChange={e => setSearchId(e.target.value)}
+              style={{ width: "100%", marginBottom: "4px" }}
+            />
+            <button style={{ width: "100%" }} onClick={search}>
+              Buscar
+            </button>
+          </div>
 
-          <input placeholder="Eliminar ID" value={deleteId} onChange={e => setDeleteId(e.target.value)} />
-          <button onClick={remove}>Eliminar</button>
+          <div>
+            <input
+              type="number"
+              placeholder="ID a eliminar"
+              value={deleteId}
+              onChange={e => setDeleteId(e.target.value)}
+              style={{ width: "100%", marginBottom: "4px" }}
+            />
+            <button style={{ width: "100%" }} onClick={remove}>
+              Eliminar
+            </button>
+          </div>
 
-          <button onClick={complete}>Completar más prioritaria</button>
+          <button style={{ width: "100%" }} onClick={completeHighest}>
+            Completar más prioritaria
+          </button>
         </div>
       </div>
 
-      {message && <p><strong>{message}</strong></p>}
+      {message && (
+        <div
+          style={{
+            marginTop: "16px",
+            padding: "8px",
+            backgroundColor: "#e8f4ff",
+            borderRadius: "6px",
+            border: "1px solid #bcdfff",
+            fontSize: "0.9rem"
+          }}
+        >
+          {message}
+        </div>
+      )}
 
-      <h2>Tareas (Heap)</h2>
-      <TaskTable tasks={tasks} />
+      <h2 style={{ marginTop: "24px" }}>Tareas (Heap)</h2>
+      <TaskTable tasks={tasks} onComplete={completeById} />
     </div>
   );
 }
 
 export default App;
-
-
-
 
 
 //PRUEBAS COMENTADAS (PARA COMPROBAR ANTES DE DESAROLLAR LA GUI)

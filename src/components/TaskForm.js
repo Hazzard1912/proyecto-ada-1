@@ -19,7 +19,7 @@ export default function TaskForm({ onSubmit }) {
   return (
     <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
       <h3>Agregar / Actualizar tarea</h3>
-
+      
       <input value={id} onChange={e => setId(e.target.value)} placeholder="ID único" />
       <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Descripción" />
       <input value={dueDate} onChange={e => setDueDate(e.target.value)} placeholder="Fecha (YYYY-MM-DD)" />
