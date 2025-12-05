@@ -1,3 +1,91 @@
+import { useState } from "react";
+import TaskForm from "./components/TaskForm";
+import TaskTable from "./components/TaskTable";
+import { Task } from "./structures/Task";
+import { TaskManager } from "./structures/TaskManager";
+
+const manager = new TaskManager();
+
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [searchId, setSearchId] = useState("");
+  const [deleteId, setDeleteId] = useState("");
+  const [message, setMessage] = useState("");
+
+  const refresh = () => setTasks(manager.getAll());
+
+  const addOrUpdate = (data) => {
+    const t = new Task(data.id, data.description, data.priority, data.dueDate);
+    const exists = manager.getById(t.id);
+
+    if (exists) {
+      manager.update(t);
+      setMessage(`Tarea ${t.id} actualizada`);
+    } else {
+      manager.add(t);
+      setMessage(`Tarea ${t.id} agregada`);
+    }
+    refresh();
+  };
+
+  const complete = () => {
+    const t = manager.completeHighest();
+    if (!t) return setMessage("No hay tareas");
+    setMessage(`Completada tarea ID ${t.id}`);
+    refresh();
+  };
+
+  const search = () => {
+    const id = Number(searchId);
+    const t = manager.getById(id);
+    if (!t) setMessage(`No existe tarea con ID ${id}`);
+    else setMessage(`Encontrada tarea ${id}: ${t.description}`);
+  };
+
+  const remove = () => {
+    const id = Number(deleteId);
+    const ok = manager.delete(id);
+    setMessage(ok ? `Tarea ${id} eliminada` : `No existe tarea ${id}`);
+    refresh();
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Gestión de Tareas con Heap y AVL</h1>
+
+      <div style={{ display: "flex", gap:"20px" }}>
+        <TaskForm onSubmit={addOrUpdate} />
+
+        <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+          <h3>Operaciones</h3>
+
+          <input placeholder="Buscar ID" value={searchId} onChange={e => setSearchId(e.target.value)} />
+          <button onClick={search}>Buscar</button>
+
+          <input placeholder="Eliminar ID" value={deleteId} onChange={e => setDeleteId(e.target.value)} />
+          <button onClick={remove}>Eliminar</button>
+
+          <button onClick={complete}>Completar más prioritaria</button>
+        </div>
+      </div>
+
+      {message && <p><strong>{message}</strong></p>}
+
+      <h2>Tareas (Heap)</h2>
+      <TaskTable tasks={tasks} />
+    </div>
+  );
+}
+
+export default App;
+
+
+
+
+
+//PRUEBAS COMENTADAS (PARA COMPROBAR ANTES DE DESAROLLAR LA GUI)
+
+/*
 import { useEffect, useState } from "react";
 import { Task } from "./structures/Task";
 import { TaskManager } from "./structures/TaskManager";
@@ -136,3 +224,4 @@ function App() {
 }
 
 export default App;
+*/
